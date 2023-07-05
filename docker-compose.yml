@@ -12,7 +12,7 @@ services:
     #  - rabbitmq
     links:
       - mongodb
-    # - rabbitmq
+      - rabbitmq
     environment:
         - MONGODB_URL=mongodb://root:example@localhost:27017/
     networks:
@@ -35,20 +35,20 @@ services:
     command: mongod --bind_ip_all
 
 
-  # rabbitmq:
-  #   image: rabbitmq:3-management
-  #   container_name: rabbitmq
-  #   environment:
-  #     - RABBITMQ_DEFAULT_USER=guest
-  #     - RABBITMQ_DEFAULT_PASS=guest
-  #   expose:
-  #     - 5672
-  #     - 15672
-  #   ports:
-  #     - 5672:5672
-  #     - 15672:15672
-  #   networks:
-  #     - node-network
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    expose:
+      - 5672
+      - 15672
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - node-network
 
 networks:
   node-network:

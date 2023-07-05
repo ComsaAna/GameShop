@@ -1,2 +1,2 @@
-defmodule ApiTest do
+defmodule BackendStuffApi.ApiTest do
 end

@@ -1,4 +1,4 @@
-defmodule Api.Service.Auth do
+defmodule BackendStuffApi.Api.Service.Auth do
   use GenServer
   use Timex
 

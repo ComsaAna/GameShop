@@ -1,3 +1,3 @@
-defmodule Api.Token do
+defmodule BackendStuffApi.Api.Token do
   use Joken.Config
 end

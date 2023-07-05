@@ -1,6 +1,6 @@
-defmodule Api.Models.Base do
+defmodule BackendStuffApi.Api.Models.Base do
 
-  alias Api.Helpers.MapHelper
+  alias BackendStuffApi.Api.Helpers.MapHelper
 
   use Timex
 

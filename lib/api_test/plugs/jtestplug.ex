@@ -1,4 +1,4 @@
-defmodule Api.Plugs.JsonTestPlug do
+defmodule BackendStuffApi.Api.Plugs.JsonTestPlug do
   import Plug.Conn
 
   def init(opts), do: opts
