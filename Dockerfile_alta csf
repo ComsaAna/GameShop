@@ -1,0 +1,34 @@
+# Use a suitable Elixir base image
+FROM elixir:1.14.4
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    inotify-tools
+
+# Install MongoDB client tools
+RUN curl -fsSL https://www.mongodb.org/static/pgp/server-5.0.asc | apt-key add -
+RUN echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/5.0 main" | tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+RUN apt-get update && apt-get install -y mongodb-org-tools
+
+# Install Elixir dependencies
+COPY mix.* /app/
+RUN mix local.hex --force && mix local.rebar --force
+RUN mix deps.get
+
+# Copy the rest of the app source code into the container
+COPY . /app/
+
+# Build the Elixir app
+RUN mix compile
+
+# Set the environment variables for your app
+ENV MIX_ENV=prod
+ENV DB_HOST=mongodb
+
+# Specify the command to start your Elixir app
+CMD ["mix", "run", "--no-halt"]

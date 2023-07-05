@@ -1,0 +1,30 @@
+# Use a suitable Elixir base image
+FROM elixir:1.14.4
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    inotify-tools
+
+# Install Elixir dependencies
+COPY mix.* /app/
+RUN mix local.hex --force && mix local.rebar --force
+RUN mix deps.get
+#RUN mix deps.compile credentials_obfuscation --force
+
+# Copy the rest of the app source code into the container
+COPY . /app/
+
+# Build the Elixir app
+RUN mix compile
+
+# Set the environment variables for your app
+ENV MIX_ENV=prod
+
+# Specify the command to start your Elixir app
+CMD ["mix", "run", "--no-halt"]

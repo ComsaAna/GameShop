@@ -1,0 +1,79 @@
+version: '3.7'
+services:
+  elixir_app:
+    container_name: ElixirApp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:     # Docker need to expose ports for you to access your app.
+      - 4000:4000
+    depends_on:
+      - mongodb
+    #  - rabbitmq
+    links:
+      - mongodb
+    # - rabbitmq
+    environment:
+        - MONGODB_URL=mongodb://root:example@localhost:27017/
+    networks:
+      - node-network
+
+  mongodb:
+    image: mongo:5.0.18
+    container_name: mongo
+    environment:
+      MONGO_INITDB_DATABASE: backend_stuff_api_db
+      # MONGO_INITDB_ROOT_USERNAME: root
+      # MONGO_INITDB_ROOT_PASSWORD: example
+    restart: always
+    expose:
+      - 27017
+    ports:
+      - 27017:27017
+    networks:
+      - node-network
+    command: mongod --bind_ip_all
+
+
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   container_name: rabbitmq
+  #   environment:
+  #     - RABBITMQ_DEFAULT_USER=guest
+  #     - RABBITMQ_DEFAULT_PASS=guest
+  #   expose:
+  #     - 5672
+  #     - 15672
+  #   ports:
+  #     - 5672:5672
+  #     - 15672:15672
+  #   networks:
+  #     - node-network
+
+networks:
+  node-network:
+    driver: bridge
+# version: "3.8"
+# services:
+#   mongo:
+#       image: mongo:latest
+#       container_name: mongo
+#       environment:
+#         MONGO_INITDB_DATABASE: my_apbackend_stuff_api_dbp_db
+#         MONGO_INITDB_ROOT_USERNAME: root
+#         MONGO_INITDB_ROOT_PASSWORD: example
+#       ports:
+#         - 27017:27017
+#       volumes:
+#         - ./mongodb_data_container:/data/db
+#         - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+#         - ./_build:/app/_build
+#   app:
+#       build:
+#         context: .
+#       container_name: ElixirApp
+#       ports:
+#         - 4000:4000
+#       volumes:
+#         - ./:/app
+#       command: mix run --no-halt
