@@ -1,4 +1,4 @@
-defmodule Api.Helpers.EventBus do
+defmodule BackendStuffApi.Api.Helpers.EventBus do
   alias AMQP.Channel
   alias AMQP.Connection
 

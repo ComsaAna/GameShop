@@ -1,7 +1,7 @@
-defmodule Api.Router do
+defmodule BackendStuffApi.Router do
   use Plug.Router
 
-  alias Api.Service.Publisher
+  alias BackendStuffApi.Api.Service.Publisher
 
   @routing_keys Application.get_env(:api_test, :routing_keys)
 
@@ -20,20 +20,34 @@ defmodule Api.Router do
     |>send_resp(conn.status, conn.assigns |> Map.get(:jsonapi, %{}) |> Poison.encode!)
   end
 
+  get("/", do: send_resp(conn, 200, "OK"))
+
+  get("/aliens_name", do: send_resp(conn, 200, "Blork Erlang"))
+
+  get "/knockknock" do
+    # Starts an unpooled connection
+    case Mongo.start_link(url: "mongodb://localhost:27017/backend_stuff_api_db") do
+      {:ok, _} -> send_resp(conn, 200, "Who's there?")
+      {:error, _} -> send_resp(conn, 500, "Something went wrong")
+    end
+  end
+
+
+
   post "/login" do
     {email, password} = {
       Map.get(conn.params, "email", nil),
       Map.get(conn.params, "password", nil)
     }
 
-    {:ok, service} = Api.Service.Auth.start_link
+    {:ok, service} = BackendStuffApi.Api.Service.Auth.start_link
 
     case :ets.lookup(:users, email) do
       [{_,user}] ->
 
-        case Api.Service.Auth.verify_hash(service, {password, user.password}) do
+        case BackendStuffApi.Api.Service.Auth.verify_hash(service, {password, user.password}) do
           true ->
-            token = Api.Service.Auth.issue_token(service, %{:id => email})
+            token = BackendStuffApi.Api.Service.Auth.issue_token(service, %{:id => email})
 
            #publishing login event
            Publisher.publish(
@@ -77,39 +91,39 @@ defmodule Api.Router do
     end
   end
 
-  post "/sign-up", private: @skip_token_verification do
-    {email, password} = {
-      Map.get(conn.params, "email", nil),
-      Map.get(conn.params, "password", nil)
-    }
+  # post "/sign-up", private: @skip_token_verification do
+  #   {email, password} = {
+  #     Map.get(conn.params, "email", nil),
+  #     Map.get(conn.params, "password", nil)
+  #   }
 
-    cond do
-      is_nil(email) ->
-        conn
-        |> put_status(400)
-        |> assign(:jsonapi, %{"error" => "email field must be provided"})
-      is_nil(password) ->
-        conn
-        |> put_status(400)
-        |> assign(:jsonapi, %{"error" => "password field must be provided"})
-      true ->
-        {:ok, service} = Api.Service.Auth.start_link
-        user = %Api.User{
-          email: email,
-          password: Api.Service.Auth.generate_hash(service, password)
-        }
-        :ets.insert(:users, {user.email, user})
-        conn
-        |> put_status(201)
-        |> assign(:jsonapi, %{"message" => "User registered"})
-        |> assign(:user_id, user.email)
-        |> assign(:auth_service, service)
-    end
-  end
+  #   cond do
+  #     is_nil(email) ->
+  #       conn
+  #       |> put_status(400)
+  #       |> assign(:jsonapi, %{"error" => "email field must be provided"})
+  #     is_nil(password) ->
+  #       conn
+  #       |> put_status(400)
+  #       |> assign(:jsonapi, %{"error" => "password field must be provided"})
+  #     true ->
+  #       {:ok, service} = BackendStuffApi.Api.Service.Auth.start_link
+  #       user = BackendStuffApi.Api.User{
+  #         email: email,
+  #         password: BackendStuffApi.Api.Service.Auth.generate_hash(service, password)
+  #       }
+  #       :ets.insert(:users, {user.email, user})
+  #       conn
+  #       |> put_status(201)
+  #       |> assign(:jsonapi, %{"message" => "User registered"})
+  #       |> assign(:user_id, user.email)
+  #       |> assign(:auth_service, service)
+  #   end
+  # end
 
   post "/logout/:email" do
-    {:ok, service} = Api.Service.Auth.start_link
-    case Api.Service.Auth.delete_token(service, %{:id => email}) do
+    {:ok, service} = BackendStuffApi.Api.Service.Auth.start_link
+    case BackendStuffApi.Api.Service.Auth.delete_token(service, %{:id => email}) do
       :ok ->
         conn
         |> put_status(200)
@@ -123,12 +137,12 @@ defmodule Api.Router do
     end
   end
 
- forward("/games", to: Api.Endpoint)
+#  forward("/games", to: BackendStuffApi.Api.Endpoint)
 
-  match _ do
-    conn
-    #|> put_status(404)
-    #|> assign(:jsonapi, %{"message" => "not found"})
-    |> send_resp(404, Poison.encode!(%{message: "Not Found"}))
-  end
+#   match _ do
+#     conn
+#     #|> put_status(404)
+#     #|> assign(:jsonapi, %{"message" => "not found"})
+#     |> send_resp(404, Poison.encode!(%{message: "Not Found"}))
+#   end
 end

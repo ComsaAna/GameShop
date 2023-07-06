@@ -1,4 +1,4 @@
-defmodule Api.Helpers.MapHelper do
+defmodule BackendStuffApi.Api.Helpers.MapHelper do
   @doc "
   Takes String keys in a Map and convers them to Atoms.
   "

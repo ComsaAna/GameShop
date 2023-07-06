@@ -1,4 +1,4 @@
-defmodule Api.User do
+defmodule BackendStuffApi.Api.User do
 
   defstruct [
     :email,

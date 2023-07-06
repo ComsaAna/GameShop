@@ -1,4 +1,4 @@
-defmodule Api.Plugs.AuthPlug do
+defmodule BackendStuffApi.Api.Plugs.AuthPlug do
   import Plug.Conn
 
   def init(opts), do: opts

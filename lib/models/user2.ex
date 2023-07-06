@@ -1,4 +1,4 @@
-defmodule Api.Models.User do
+defmodule BackendStuffApi.Api.Models.User do
   @db_name Application.get_env(:api_test, :db_db)
   @db_table "user"
 
@@ -13,7 +13,7 @@ defmodule Api.Models.User do
   #/users PATCH (UPDATE username)
   #
   # User(id, username, email, password)
-  use Api.Models.Base
+  use BackendStuffApi.Api.Models.Base
   #INFO: mongo also has an internal ID
   #ignored in this exercise
   defstruct [
